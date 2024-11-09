@@ -6,18 +6,45 @@ We'll use the connector to advertise the Kubernetes pod CIDR as well as the serv
 
 ## Get Kubernetes pod CIDR range
 
-We'll need to retrieve the pod CIDR for your cluster. Use the following `kubectl` command:
+We'll need to retrieve the pod CIDR for your cluster. Each CNI hands this out differently, so you may not be able to retrieve this easily from `kubectl` - refer to your Kubernetes provider for more information. The following are some examples that may work
 
 ```bash
 kubectl cluster-info dump | grep -m 1 podCIDR
 ```
 
-## Get Kubernetes service CIDR range
-
-We'll need to retrieve the service CIDR for your cluster. Use the following `kubectl` command to:
+### GKE
 
 ```bash
-kubectl get --raw /api/v1/nodes | grep -m 1 serviceCIDR
+gcloud container clusters describe <cluster-name> --region=<region>
+```
+
+### AKS
+
+```bash
+az aks show --resource-group <rg> --name <cluster-name> --query networkProfile.podCidr
+```
+
+### DOKS
+
+```bash
+doctl kubernetes cluster get <cluster id> --format ClusterSubnet
+```
+
+### Minikube
+
+```
+minikube ssh "cat /var/lib/kubelet/config.yaml | grep -i podCIDR"
+```
+
+## Get Kubernetes service CIDR range
+
+Similarly, we'll need to find the service CIDR. Managed services usually have a default, but consult your provider for more information.
+
+
+### DOKS
+
+```bash
+doctl kubernetes cluster get <cluster-id> --format ServiceSubnet
 ```
 
 ## Create the connector
@@ -48,17 +75,46 @@ spec:
 
 ## Verify
 
-Once you have applied the connector configurations, verify that Tailscale is correctly advertising the routes:
+Once you have applied the connector configurations, you should see two new devices in your tailnet.
 
-1. Check Tailscale Status: Run the following to ensure Tailscale is advertising the routes:
+![connectors](./img/connectors.png)
+
+Note, the routes we have advertised are not yet approved (notice the Subnet (!)) indictator
+
+Navigate to each device and approve the routes.
+
+![approved](./img/routes-approved.png)
+
+### Use `tailscale ping` for a pod
+
+Find a pod in the cluster:
 
 ```bash
-tailscale status
+kubectl get pods -A -o wide
 ```
 
-Look for the advertised routes in the output.
+Use `tailscale ping` to verify connectivity to it
 
-2. Verify Connectivity: From a Tailscale-connected device, ping an IP within the advertised Pod or Service CIDR to confirm connectivity.
+```bash
+tailscale ping 10.244.0.45
+pong from ts-pod-cidrs (100.74.174.48) via 143.110.148.7:47770 in 44ms
+```
 
-This completes the setup for Tailscale connectors within Kubernetes.
+### Use `tailscale ping` for a svc
+
+Find a service in the cluster:
+
+```bash
+kubectl get svc -A -o wide
+```
+
+Use `tailscale ping` to verify connectivity to it
+
+```bash
+tailscale ping 10.245.0.1
+pong from ts-svc-cidrs (100.64.76.28) via DERP(sfo) in 37ms
+pong from ts-svc-cidrs (100.64.76.28) via DERP(sfo) in 37ms
+pong from ts-svc-cidrs (100.64.76.28) via DERP(sfo) in 41ms
+pong from ts-svc-cidrs (100.64.76.28) via 143.110.148.7:54806 in 35ms
+```
 
