@@ -40,6 +40,11 @@ minikube ssh "cat /var/lib/kubelet/config.yaml | grep -i podCIDR"
 
 Similarly, we'll need to find the service CIDR. Managed services usually have a default, but consult your provider for more information.
 
+### Minikube
+
+```bash
+kubectl cluster-info dump | grep -m 1 service-cluster
+```
 
 ### DOKS
 

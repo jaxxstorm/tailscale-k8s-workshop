@@ -24,6 +24,14 @@ Create an OAuth client in the OAuth clients page of the admin console. Create th
 
 # Install the operator
 
+Add the operator helm repository to your local helm repositories
+
+```bash
+helm repo add tailscale https://pkgs.tailscale.com/helmcharts
+```
+
+Then, install the operator with your oauth credentials.
+
 ```bash
 helm upgrade \
   --install \
