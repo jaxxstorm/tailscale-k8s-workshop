@@ -32,6 +32,13 @@ helm repo add tailscale https://pkgs.tailscale.com/helmcharts
 
 Then, install the operator with your oauth credentials.
 
+Firstly, set the oauth secret with an env var so you can copy and paste the installation command
+
+```bash
+export TS_OAUTH_CLIENT_ID=<your client id>
+export TS_OAUTH_SECRET=<you secret>
+```
+
 ```bash
 helm upgrade \
   --install \
@@ -39,8 +46,8 @@ helm upgrade \
   tailscale/tailscale-operator \
   --namespace=tailscale \
   --create-namespace \
-  --set-string oauth.clientId="<OAauth client ID>" \
-  --set-string oauth.clientSecret="<OAuth client secret>" \
+  --set-string oauth.clientId="${TS_OAUTH_CLIENT_ID}" \
+  --set-string oauth.clientSecret="${TS_OAUTH_SECRET}" \
   --wait
 ```
 
@@ -52,4 +59,23 @@ Verify the Tailscale operator is working as expected:
 kubectl get pods -n tailscale
 ```
 
-You should also see a Tailscale operator node in the Tailscale console
+You should also see a Tailscale operator node in the Tailscale console.
+
+
+<div class="alert-note">
+  ⚠️ Make sure you see the information (https://tailscale.com/kb/1080/cli)[here] about using the CLI, especially for OS X! You may need to add an alias or install the CLI via the Mac app
+</div>
+
+This new pod has given you connectivity to another Tailscale device. You can see it in `tailscale status`
+
+```bash
+tailscale status
+100.70.230.73   macbook-pro-lbr      jaxxstorm@   macOS   -
+100.77.176.118  tailscale-operator   tagged-devices linux   -
+```
+
+And connect to it via `tailscale ping`
+
+```bash
+tailscale ping tailscale-operator
+```

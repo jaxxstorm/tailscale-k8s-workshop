@@ -1,8 +1,16 @@
 # Connectors
 
-Connectors are the Kubernetes custom resource for a subnet router. A connector will allow you to use Tailscale to connect to any address within the connectors cidr block.
+Connectors are the Kubernetes custom resource for a (https://tailscale.com/kb/1019/subnets)[subnet router]. A connector will allow you to use Tailscale to connect to any address within the connectors cidr block.
 
-We'll use the connector to advertise the Kubernetes pod CIDR as well as the service CIDR.
+You can see a rough diagram of this here:
+
+![subnet-router](./img/subnet-router.png)
+
+You deploy a subnet router into a remote network, and it advertises the entire address range to the rest of your Tailscale clients, including your laptop.
+
+The Tailscale Kubernetes operator includes a CRD which will create a subnet router for you, called a `Connector`
+
+We'll use the `Connector` to advertise the Kubernetes pod CIDR as well as the service CIDR, allowing us to access the cluster's network seamlessly
 
 ## Get Kubernetes pod CIDR range
 
@@ -121,5 +129,60 @@ pong from ts-svc-cidrs (100.64.76.28) via DERP(sfo) in 37ms
 pong from ts-svc-cidrs (100.64.76.28) via DERP(sfo) in 37ms
 pong from ts-svc-cidrs (100.64.76.28) via DERP(sfo) in 41ms
 pong from ts-svc-cidrs (100.64.76.28) via 143.110.148.7:54806 in 35ms
+```
+
+### Deploy a webserver
+
+We can deploy a webserver, and access it directly in the cluster.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels:
+    app: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+```
+
+You can now retrieve the pod IP and curl it directly:
+
+```bash
+curl "http://$(kubectl get pods -l app=nginx -o jsonpath='{.items[*].status.podIP}')"
+```
+
+or use the service directly:
+
+```bash
+curl "http://$(kubectl get svc nginx-service -o jsonpath='{.spec.clusterIP}')"
 ```
 
