@@ -15,7 +15,7 @@ To successfully complete this workshop, ensure you have the following tools and 
 ## 2. Helm Installed
 
 - **Tool**: Helm, the Kubernetes package manager, should be installed and functioning.
-- **Documentation**: [Helm Installation Guide](https://helm.sh/docs/intro/install/)
+- **Documentation**: [Helm Installation Guide](https://helm.sh/docs/intro/install/).
 
 ## 3. Tailscale Account
 
@@ -25,13 +25,17 @@ To successfully complete this workshop, ensure you have the following tools and 
 ## 4. Tailscale Installed
 
 - **Installation**: Tailscale should be installed on your local machine. Refer to the official installation guide for steps tailored to your operating system:
-  - [Tailscale Installation Guide](https://tailscale.com/download)
+  - [Tailscale Installation Guide](https://tailscale.com/download).
   - Login to Tailscale.
 
 ## 5. HTTPS Enabled for your Tailnet
 
 Ensure HTTPS is enabled for your Tailnet.
 
-- **Admin Console**: Select DNS -> HTTPS Certificates -> Enable HTTPS
+- **Admin Console**: `Select DNS` -> `HTTPS Certificates` -> `Enable HTTPS`
+- [Tailscale HTTPS documentation](https://tailscale.com/kb/1153/enabling-https).
 
 After confirming these prerequisites, proceed with the workshop to set up and configure your environment.
+
+---
+## Continue to [Install the Tailscale Kubernetes Operator](operator.md)
