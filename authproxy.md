@@ -88,3 +88,7 @@ kubectl get nodes
 
 This command is now going through the Tailscale operator!
 
+
+---
+## Continue to [Create a Connector](connector.md)
+

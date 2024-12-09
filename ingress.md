@@ -83,6 +83,6 @@ spec:
         - demo-https
 ```
 
-It will take a few moments for Tailscale to issues a certificate for this service. Once it has, try loading https://demo-https.<unique-tailnet-identifier>.ts.net/
+It will take a few moments for Tailscale to issues a certificate for this service. Once it has, try loading `https://demo-https.<unique-tailnet-identifier>.ts.net/`
 
 

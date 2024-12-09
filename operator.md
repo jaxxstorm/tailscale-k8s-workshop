@@ -81,3 +81,6 @@ And connect to it via `tailscale ping`
 ```bash
 tailscale ping tailscale-operator
 ```
+
+---
+## Continue to [Enable the Auth Proxy](authproxy.md)
