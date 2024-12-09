@@ -186,3 +186,5 @@ or use the service directly:
 curl "http://$(kubectl get svc nginx-service -o jsonpath='{.spec.clusterIP}')"
 ```
 
+---
+## Continue to [Allow traffic into the cluster](ingress.md)
